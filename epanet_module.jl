@@ -18,7 +18,7 @@ function ENepanet(inp_file::String, rpt_file::String="", out_file::String="", vf
     - `inp_file::String`: name of the input file.
     - `rpt_file::String=""`: name of an output report file.
     - `out_file::String=""`: name of an optional binary output file.
-    - `vfunc=0`: pointer to a user-supplied function which accepts a pointer its argument.
+    - `vfunc=0`: pointer to a user-supplied function which accepts a pointer as its argument.
     ...
     """
     sym = Libdl.dlsym(lib, :ENepanet)
@@ -293,20 +293,107 @@ function ENsetreport(file::String)
     return getEpanetErrorMessage(error)
 end
 
+function ENgetcontrol(control_index::Int)
+    """Retrieves the parameters of a simple control statement."""
+    control_type::Ref{Int32} = 0
+    link_index::Ref{Int32} = 0
+    setting::Ref{Float32} = 0
+    node_index::Ref{Int32} = 0
+    level::Ref{Float32} = 0
+    sym = Libdl.dlsym(lib, :ENgetcontrol)
+    error = ccall(sym, Cint, (Cint, Ref{Int32}, Ref{Int32}, Ref{Float32}, Ref{Int32}, Ref{Float32},),
+                control_index, control_type, link_index, setting, node_index, level)
+    return error ≠ 0 ? getEpanetErrorMessage(error) : control_index[], link_index[], setting[], node_index[], level[]
+end
+
+# err = ENgetcontrol(1)
+
+function ENgetcount(element::Int)
+    """Retrieves the number of objects of a given type in a project."""
+    count::Ref{Int32} = 0
+    sym = Libdl.dlsym(lib, :ENgetcount)
+    error = ccall(sym, Cint, (Cint, Ref{Int32},), element, count)
+    return error ≠ 0 ? getEpanetErrorMessage(error) : count[]
+end
+
+# err = ENgetcount(EN_NODECOUNT)
+
+function ENgetoption(option::Int)
+    """Retrieves the value of an analysis option."""
+    value::Ref{Float32} = 0
+    sym = Libdl.dlsym(lib, :ENgetoption)
+    error = ccall(sym, Cint, (Cint, Ref{Float32},), option, value)
+    return error ≠ 0 ? getEpanetErrorMessage(error) : value[]
+end
+
+# err = ENgetoption(EN_TOLERANCE)
+
+function ENgettimeparam(parameter::Int)
+    """Retrieves the value of a time parameter."""
+    value::Ref{Int64} = 0
+    sym = Libdl.dlsym(lib, :ENgettimeparam)
+    error = ccall(sym, Cint, (Cint, Ref{Int64},), parameter, value)
+    return error ≠ 0 ? getEpanetErrorMessage(error) : value[]
+end
+
+err = ENgettimeparam(EN_DURATION)
+
+function ENgetflowunits()
+    """Retrieves a project's flow units."""
+    value::Ref{Int32} = 0
+    sym = Libdl.dlsym(lib, :ENgetflowunits)
+    error = ccall(sym, Cint, (Ref{Int32},), value)
+    return error ≠ 0 ? getEpanetErrorMessage(error) : value[]
+end
+
+# err = ENgetflowunits()
+
+function ENgetpatternindex(id::String)
+    """Retrieves the index of a time pattern given its ID name."""
+    index::Ref{Int32} = 0
+    sym = Libdl.dlsym(lib, :ENgetpatternindex)
+    error = ccall(sym, Cint, (Cstring, Ref{Int32},), id, index)
+    return error ≠ 0 ? getEpanetErrorMessage(error) : index[]
+end
+
+err = ENgetpatternindex("1")
+
+function ENgetpatternid(index::Int)
+    """Retrieves the ID name of a time pattern given its index."""
+    id::String = repeat("\n", 32)
+    sym = Libdl.dlsym(lib, :ENgetpatternid)
+    error = ccall(sym, Cint, (Cint, Cstring,), index, id)
+    id = rstrip(id, ['\0', '\n'])
+    return error ≠ 0 ? getEpanetErrorMessage(error) : id
+end
+
+
+err = ENgetpatternid(1)
 
 
 
 
 
+function ENgetnodeindex(id::String)
+    """Gets the index of a node given its ID"""
+    index::Ref{Int32} = 0
+    sym = Libdl.dlsym(lib, :ENgetnodeindex)
+    error = ccall(sym, Cint, (Cstring, Ref{Int32},), id, index)
+    return error ≠ 0 ? getEpanetErrorMessage(error) : index[]
+end
 
+err = ENgetnodeindex("129")
 
+function ENgetnodeid(index::Int)
+    """Gets the ID name of a node given its index"""
+    id::String = repeat("\n", 32)
+    sym = Libdl.dlsym(lib, :ENgetnodeid)
+    error = ccall(sym, Cint, (Cint, Cstring,), index, id)
+    id = rstrip(id, ['\0', '\n'])
+    return error ≠ 0 ? getEpanetErrorMessage(error) : id
+end
 
-
-
-
-
-
-
+err = ENgetnodeid(25)
 
 
 
