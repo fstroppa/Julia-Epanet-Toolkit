@@ -367,11 +367,49 @@ function ENgetpatternid(index::Int)
     return error ≠ 0 ? getEpanetErrorMessage(error) : id
 end
 
-
 err = ENgetpatternid(1)
 
+function ENgetpatternlen(index::Int)
+    """Retrieves the number of time periods in a time pattern"""
+    length::Ref{Int32} = 0
+    sym = Libdl.dlsym(lib, :ENgetpatternlen)
+    error = ccall(sym, Cint, (Cint, Ref{Int32},), index, length)
+    return error ≠ 0 ? getEpanetErrorMessage(error) : length[]
+end
+
+err = ENgetpatternlen(1)
 
 
+function ENgetpatternvalue(index::Int = 1, period::Int = 1)
+    """Retrieves a time pattern's factor for a given time period."""
+    value::Ref{Float32} = 0
+    sym = Libdl.dlsym(lib, :ENgetpatternvalue)
+    error = ccall(sym, Cint, (Cint, Cint, Ref{Float32},), index, period, value)
+    return error ≠ 0 ? getEpanetErrorMessage(error) : value[]
+end
+
+err = ENgetpatternvalue()
+
+function ENgetqualtype()
+    """Retrieves the type of water quality analysis to be run."""
+    qual_type::Ref{Int32} = 0
+    trace_node::Ref{Int32} = 0
+    sym = Libdl.dlsym(lib, :ENgetqualtype)
+    error = ccall(sym, Cint, (Ref{Int32}, Ref{Int32},), qual_type, trace_node)
+    return error ≠ 0 ? getEpanetErrorMessage(error) : qual_type[], trace_node[]
+end
+
+err = ENgetqualtype()
+
+function ENgeterror(error_code::Int32, max_len::Int=127)
+    error_message::String = repeat("\n", 127)
+    sym = Libdl.dlsym(lib, :ENgeterror)
+    error = ccall(sym, Cint, (Cint, Cstring, Cint,), error_code, error_message, max_len)
+    error_message = rstrip(error_message, ['\0', '\n'])
+    return error ≠ 0 ? getEpanetErrorMessage(error) : error_message
+end
+
+err = ENgeterror(102, 127)
 
 
 function ENgetnodeindex(id::String)
@@ -395,36 +433,226 @@ end
 
 err = ENgetnodeid(25)
 
+function ENgetnodetype(index::Int)
+    """Retrieves a node's type given its index."""
+    node_type::Ref{Int32} = 0
+    sym = Libdl.dlsym(lib, :ENgetnodetype)
+    error = ccall(sym, Cint, (Cint, Ref{Int32},), index, node_type)
+    return error ≠ 0 ? getEpanetErrorMessage(error) : node_type[]
+end
+
+err = ENgetnodetype(97)
+
+function ENgetnodevalue(index::Int, property::Int)
+    """Retrieves a property value for a node."""
+    value::Ref{Float32} = 0
+    sym = Libdl.dlsym(lib, :ENgetnodevalue)
+    error = ccall(sym, Cint, (Cint, Cint, Ref{Float32},), index, property, value)
+    return error ≠ 0 ? getEpanetErrorMessage(error) : value[]
+end
 
 
+
+
+
+
+
+
+
+function ENgetlinkindex(id::String)
+    """Gets the index of a link given its ID name."""
+    index::Ref{Int32} = 0
+    sym = Libdl.dlsym(lib, :ENgetlinkindex)
+    error = ccall(sym, Cint, (Cstring, Ref{Int32},), id, index)
+    return error ≠ 0 ? getEpanetErrorMessage(error) : index[]
+end
+
+err = ENgetlinkindex("129")
+
+function ENgetlinkid(index::Int)
+    """Gets the ID name of a link given its index"""
+    id::String = repeat("\n", 32)
+    sym = Libdl.dlsym(lib, :ENgetlinkid)
+    error = ccall(sym, Cint, (Cint, Cstring,), index, id)
+    id = rstrip(id, ['\0', '\n'])
+    return error ≠ 0 ? getEpanetErrorMessage(error) : id
+end
+
+err = ENgetlinkid(23)
+
+function ENgetlinktype(index::Int)
+    """Retrieves a link's type given its index."""
+    link_type::Ref{Int32} = 0
+    sym = Libdl.dlsym(lib, :ENgetlinktype)
+    error = ccall(sym, Cint, (Cint, Ref{Int32},), index, link_type)
+    return error ≠ 0 ? getEpanetErrorMessage(error) : link_type[]
+end
+
+err = ENgetlinktype(97)
+
+function ENgetlinknodes(index::Int)
+    """Gets the indexes of a link's start- and end-nodes."""
+    node_1_index::Ref{Int32} = 0
+    node_2_index::Ref{Int32} = 0
+    sym = Libdl.dlsym(lib, :ENgetlinknodes)
+    error = ccall(sym, Cint, (Cint, Ref{Int32}, Ref{Int32},), index, node_1_index, node_2_index)
+    return error ≠ 0 ? getEpanetErrorMessage(error) : node_1_index[], node_2_index[]
+end
+
+err = ENgetlinknodes(27)
+
+function ENgetlinkvalue(index::Int, property::Int)
+    """Retrieves a property value for a link."""
+    value::Ref{Float32} = 0
+    sym = Libdl.dlsym(lib, :ENgetlinkvalue)
+    error = ccall(sym, Cint, (Cint, Cint, Ref{Float32},), index, property, value)
+    return error ≠ 0 ? getEpanetErrorMessage(error) : value[]
+end
+
+err = ENgetlinkvalue(27, 5)
+
+function ENgetversion()
+    """Retrieves the toolkit API version number."""
+    version::Ref{Int32} = 0
+    sym = Libdl.dlsym(lib, :ENgetversion)
+    error = ccall(sym, Cint, (Ref{Int32},), version)
+    return error ≠ 0 ? getEpanetErrorMessage(error) : version[]
+end
+
+err = ENgetversion()
+
+function ENsetcontrol(control_index::Int, control_type::Int, link_index::Int,
+                     setting::Int, node_index::Int, level::Int)
+    """Sets the properties of an existing simple control."""
+    sym = Libdl.dlsym(lib, :ENsetcontrol)
+    error = ccall(sym, Cint, (Cint, Cint, Cint, Cint, Cint, Cint,), 
+            control_index, control_type, link_index, setting, node_index, level)
+    return getEpanetErrorMessage(error)
+end
+
+err = ENsetcontrol(5, 1, 1, 1, 1, 1)
+
+function ENsetnodevalue(index::Int, property::Int, value::Real)
+    """Sets a property value for a node."""
+    sym = Libdl.dlsym(lib, :ENsetnodevalue)
+    error = ccall(sym, Cint, (Cint, Cint, Cfloat,), index, property, value)
+    return getEpanetErrorMessage(error)
+end
+
+err = ENsetnodevalue(5, 1, 17.4156)
+err = ENgetnodevalue(5, 1)
+
+function ENsetlinkvalue(index::Int, property::Int, value::Real)
+    """Sets a property value for a link."""
+    sym = Libdl.dlsym(lib, :ENsetlinkvalue)
+    error = ccall(sym, Cint, (Cint, Cint, Cfloat,), index, property, value)
+    return getEpanetErrorMessage(error)
+end
+
+
+err = ENsetlinkvalue(15, 2, 7.46)
+err = ENgetlinkvalue(15, 2)
+
+function ENaddpattern(id::String)
+    """Adds a new time pattern to a project."""
+    sym = Libdl.dlsym(lib, :ENaddpattern)
+    error = ccall(sym, Cint, (Cstring,), id)
+    return getEpanetErrorMessage(error)
+end
+
+err = ENgetpatternindex("testpattern")
+err = ENaddpattern("testpattern")
+err = ENgetpatternindex("testpattern")
+
+# function ENsetpattern(index::Int, values::Array)
+#     """WARNING: This function can cause compatibilities issues.
+#     Use ENsetpatternvalue instead!!!
+#     This function redefines (and resizes) a time pattern all at once;
+#     ENsetpatternvalue revises pattern factors one at a time.
+#     ...
+#     # Arguments
+#     - `index::Int`: a time pattern index (starting from 1).
+#     - `values::Array=""`: an array of new pattern factor values.
+#     ...
+#     """
+#     sym = Libdl.dlsym(lib, :ENsetpattern)
+#     len = size(values)[1]
+#     error = ccall(sym, Cint, (Cint, Array, Cint), index, values, len)
+#     return getEpanetErrorMessage(error)
+# end
+
+# err = ENsetpattern(1, [1.5, 5.4, 3.0]) ## ERROR!
+# err = ENgetpatternlen(1)
+# err = ENgetpatternvalue(1, 2)
+
+function ENsetpatternvalue(index::Int, period::Int, value::Real)
+    """Sets a time pattern's factor for a given time period."""
+        sym = Libdl.dlsym(lib, :ENsetpatternvalue)
+        error = ccall(sym, Cint, (Cint, Cint, Cfloat), index, period, value)
+        return getEpanetErrorMessage(error)
+end
+
+err = ENsetpatternvalue(1, 2, 3.5)
+err = ENgetpatternvalue(1, 2)
+
+function ENsettimeparam(parameter::Int, value::Int)
+    """Sets the value of a time parameter."""
+    sym = Libdl.dlsym(lib, :ENsettimeparam)
+    error = ccall(sym, Cint, (Cint, Clong), parameter, value)
+    return getEpanetErrorMessage(error)
+end
+
+err = ENsettimeparam(2, 5)
+err = ENgettimeparam(3)
+
+function ENsetoption(option::Int, value::Real)
+    """Sets the value for an analysis option."""
+    sym = Libdl.dlsym(lib, :ENsetoption)
+    error = ccall(sym, Cint, (Cint, Cfloat), option, value)
+    return getEpanetErrorMessage(error)
+end
+
+err = ENsetoption(1, .05)
+err = ENgetoption(1)
+
+function ENsetstatusreport(level_code::Int)
+    """Sets the level of hydraulic status reporting.
+    Status reporting writes changes in the hydraulics status of network elements to a
+    project's report file as a hydraulic simulation unfolds. There are three levels of
+    reporting: EN_NO_REPORT (no status reporting), EN_NORMAL_REPORT (normal reporting) 
+    EN_FULL_REPORT (full status reporting).
+    The full status report contains information at each trial of the solution to the 
+    system hydraulic equations at each time step of a simulation. It is useful mainly
+    for debugging purposes.
+    If many hydraulic analyses will be run in the application it is recommended that
+    status reporting be turned off (level = EN_NO_REPORT)."""
+    sym = Libdl.dlsym(lib, :ENsetstatusreport)
+    error = ccall(sym, Cint, (Cint,), level_code)
+    return getEpanetErrorMessage(error)
+end
+
+err = ENsetstatusreport(1)
+err = ENsetstatusreport(4)
+
+function ENsetqualtype(qual_type::Int, chem_name::String = "",
+                         chem_units::String = "", trace_node::String = "")
+    """Sets the type of water quality analysis to run."""
+    sym = Libdl.dlsym(lib, :ENsetqualtype)
+    error = ccall(sym, Cint, (Cint, Cstring, Cstring, Cstring,),
+                 qual_type, chem_name, chem_units, trace_node)
+    return getEpanetErrorMessage(error)
+end
+
+err = ENgetqualtype()
+err = ENsetqualtype(2)
+err = ENgetqualtype()
 
 
 """ Functions not present in Epanet"""
 
-
 function getEpanetErrorMessage(error)
-    error ≠ 0 ? epanet_errors[error] : nothing
+    error ≠ 0 ? ENgeterror(error) : nothing
 end
-
-
-# function ENgetnodevalue(index::Int64, paramcode::Int64)
-#     sym = Libdl.dlsym(lib, :ENgetnodevalue)
-#     ref = Ref{Float32}(0)
-#     err = ccall(sym, Cint,(Cint,Cint,Ref{Float32}), index, paramcode, ref)
-#     if err != 0
-#         return "Error: "*string(err)
-#     end
-#     return ref.x
-# end
-
-
-# function ENinitH(a::Int)
-#     sym = Libdl.dlsym(lib, :ENinitH)
-#     return ccall(sym, Cint, (Cint,), a)
-
-# end
-
-
 
 
 """ These are codes used by the DLL functions """
@@ -546,66 +774,4 @@ end
  EN_NOSAVE     = 0;   # Save-results-to-file flag 
  EN_SAVE       = 1;
  EN_INITFLOW   = 10;  # Re-initialize flow flag 
-
- """ These are errors produces by the DLL functions """
-epanet_errors = Dict(101 => "Error 101: insufficient memory available.",
-                    102 => "Error 102: no network data available.",
-                    103 => "Error 103: hydraulics not initialized.",
-                    104 => "Error 104: no hydraulics for water quality analysis.",
-                    105 => "Error 105: water quality not initialized.",
-                    106 => "Error 106: no results saved to report on.",
-                    107 => "Error 107: hydraulics supplied from external file.",
-                    108 => "Error 108: cannot use external file while hydraulics solver is active.",
-                    109 => "Error 109: cannot change time parameter when solver is active.",
-                    110 => "Error 110: cannot solve network hydraulic equations.",
-                    120 => "Error 120: cannot solve water quality transport equations.",
-                    200 => "Error 200: one or more errors in input file.",
-                    201 => "Error 201: syntax error in following line of [%s] section ",
-                    202 => "Error 202: %s %s contains illegal numeric value.",
-                    203 => "Error 203: %s %s refers to undefined node.",
-                    204 => "Error 204: %s %s refers to undefined link.",
-                    205 => "Error 205: %s %s refers to undefined time pattern.",
-                    206 => "Error 206: %s %s refers to undefined curve.",
-                    207 => "Error 207: %s %s attempts to control a CV.",
-                    208 => "Error 208: %s specified for undefined Node %s.",
-                    209 => "Error 209: illegal %s value for Node %s.",
-                    210 => "Error 210: %s specified for undefined Link %s.",
-                    211 => "Error 211: illegal %s value for Link %s.",
-                    212 => "Error 212: trace node %.0s %s is undefined.",
-                    213 => "Error 213: illegal option value in [%s] section   ",
-                    214 => "Error 214: following line of [%s] section contains too many characters",
-                    215 => "Error 215: %s %s is a duplicate ID.",
-                    216 => "Error 216: %s data specified for undefined Pump %s.",
-                    217 => "Error 217: invalid %s data for Pump %s.",
-                    219 => "Error 219: %s %s illegally connected to a tank.",
-                    220 => "Error 220: %s %s illegally connected to another valve.",
-                    222 => "Error 222: %s %s has same start and end nodes.",
-                    223 => "Error 223: not enough nodes in network    ",
-                    224 => "Error 224: no tanks or reservoirs in network.",
-                    225 => "Error 225: invalid lower/upper levels for Tank %s.",
-                    226 => "Error 226: no head curve supplied for Pump %s.",
-                    227 => "Error 227: invalid head curve for Pump %s.",
-                    230 => "Error 230: Curve %s has nonincreasing x-values.",
-                    233 => "Error 233: Node %s is unconnected.",
-                    240 => "Error 240: %s %s refers to undefined source.",
-                    241 => "Error 241: %s %s refers to undefined control.",
-                    250 => "Error 250: function call contains invalid format.",
-                    251 => "Error 251: function call contains invalid parameter code.",
-                    301 => "Error 301: identical file names.",
-                    302 => "Error 302: cannot open input file.",
-                    303 => "Error 303: cannot open report file.",
-                    304 => "Error 304: cannot open binary output file.",
-                    305 => "Error 305: cannot open hydraulics file.",
-                    306 => "Error 306: hydraulics file does not match network data.",
-                    307 => "Error 307: cannot read hydraulics file.",
-                    308 => "Error 308: cannot save results to file.",
-                    309 => "Error 309: cannot save results to report file.")
-
-
-# epa = ENopen("C:\\Users\\ferna\\Documents\\GitHub\\ReteIdrica2\\Epanet\\Hour_3_pumps_and_Dijkstra.inp", "")
-# ENopenH()
-# ENinitH(0)
-# ENrunH()
-# t = ENgetnodevalue(2, 1)
-# print(t)
 
