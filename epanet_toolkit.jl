@@ -1,4 +1,4 @@
-module EpanetModule
+module Epanet
 using Libdl
 
 if Sys.iswindows()
@@ -173,6 +173,7 @@ end
 
 function ENnextQ()
     """Advances a water quality simulation over the time until the next hydraulic event.
+    
     # Examples
     ```
     ENsolveH()
@@ -251,7 +252,7 @@ function ENgetcontrol(control_index::Int)
     sym = Libdl.dlsym(lib, :ENgetcontrol)
     error = ccall(sym, Cint, (Cint, Ref{Int32}, Ref{Int32}, Ref{Float32}, Ref{Int32}, Ref{Float32},),
                 control_index, control_type, link_index, setting, node_index, level)
-    return error ≠ 0 ? getEpanetErrorMessage(error) : control_index[], link_index[], setting[], node_index[], level[]
+    return error ≠ 0 ? getEpanetErrorMessage(error) : (control_type[], link_index[], setting[], node_index[], level[])
 end
 
 function ENgetcount(element::Int)
@@ -325,7 +326,7 @@ function ENgetqualtype()
     trace_node::Ref{Int32} = 0
     sym = Libdl.dlsym(lib, :ENgetqualtype)
     error = ccall(sym, Cint, (Ref{Int32}, Ref{Int32},), qual_type, trace_node)
-    return error ≠ 0 ? getEpanetErrorMessage(error) : qual_type[], trace_node[]
+    return error ≠ 0 ? getEpanetErrorMessage(error) : (qual_type[], trace_node[])
 end
 
 function ENgeterror(error_code, max_len::Int=127)
@@ -400,7 +401,7 @@ function ENgetlinknodes(index::Int)
     node_2_index::Ref{Int32} = 0
     sym = Libdl.dlsym(lib, :ENgetlinknodes)
     error = ccall(sym, Cint, (Cint, Ref{Int32}, Ref{Int32},), index, node_1_index, node_2_index)
-    return error ≠ 0 ? getEpanetErrorMessage(error) : node_1_index[], node_2_index[]
+    return error ≠ 0 ? getEpanetErrorMessage(error) : (node_1_index[], node_2_index[])
 end
 
 function ENgetlinkvalue(index::Int, property::Int)
@@ -420,10 +421,10 @@ function ENgetversion()
 end
 
 function ENsetcontrol(control_index::Int, control_type::Int, link_index::Int,
-                     setting::Int, node_index::Int, level::Int)
+                     setting::Real, node_index::Int, level::Real)
     """Sets the properties of an existing simple control."""
     sym = Libdl.dlsym(lib, :ENsetcontrol)
-    error = ccall(sym, Cint, (Cint, Cint, Cint, Cint, Cint, Cint,), 
+    error = ccall(sym, Cint, (Cint, Cint, Cint, Cfloat, Cint, Cfloat,), 
             control_index, control_type, link_index, setting, node_index, level)
     return getEpanetErrorMessage(error)
 end
@@ -524,124 +525,132 @@ end
 
 
 """ These are codes used by the DLL functions """
- EN_ELEVATION  = 0;    # Node parameters 
- EN_BASEDEMAND = 1;
- EN_PATTERN    = 2;
- EN_EMITTER    = 3;
- EN_INITQUAL   = 4;
- EN_SOURCEQUAL = 5;
- EN_SOURCEPAT  = 6;
- EN_SOURCETYPE = 7;
- EN_TANKLEVEL  = 8;
- EN_DEMAND     = 9;
- EN_HEAD       = 10;
- EN_PRESSURE   = 11;
- EN_QUALITY    = 12;
- EN_SOURCEMASS = 13;
- EN_INITVOLUME = 14;
- EN_MIXMODEL   = 15;
- EN_MIXZONEVOL = 16;
 
- EN_TANKDIAM    = 17;
- EN_MINVOLUME   = 18;
- EN_VOLCURVE    = 19;
- EN_MINLEVEL    = 20;
- EN_MAXLEVEL    = 21;
- EN_MIXFRACTION = 22;
- EN_TANK_KBULK  = 23;
+struct __node_parameters
+    EN_ELEVATION::Int
+    EN_BASEDEMAND::Int
+    EN_PATTERN::Int
+    EN_EMITTER::Int
+    EN_INITQUAL::Int
+    EN_SOURCEQUAL::Int
+    EN_SOURCEPAT::Int
+    EN_SOURCETYPE::Int
+    EN_TANKLEVEL::Int
+    EN_DEMAND::Int
+    EN_HEAD::Int
+    EN_PRESSURE::Int
+    EN_QUALITY::Int
+    EN_SOURCEMASS::Int
+    EN_INITVOLUME::Int
+    EN_MIXMODEL::Int
+    EN_MIXZONEVOL::Int
+    EN_TANKDIAM::Int
+    EN_MINVOLUME::Int
+    EN_VOLCURVE::Int
+    EN_MINLEVEL::Int
+    EN_MAXLEVEL::Int
+    EN_MIXFRACTION::Int
+    EN_TANK_KBULK::Int
+end
+# Open for suggestions for a more elegant solution.
+NODE_PARAMETER = __node_parameters(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13
+                                    , 14, 15, 16, 17, 18, 19, 20, 21, 22, 23)
+                                    
+EN_DIAMETER    = 0;    # Link parameters 
+EN_LENGTH      = 1;
+EN_ROUGHNESS   = 2;
+EN_MINORLOSS   = 3;
+EN_INITSTATUS  = 4;
+EN_INITSETTING = 5;
+EN_KBULK       = 6;
+EN_KWALL       = 7;
+EN_FLOW        = 8;
+EN_VELOCITY    = 9;
+EN_HEADLOSS    = 10;
+EN_STATUS      = 11;
+EN_SETTING     = 12;
+EN_ENERGY      = 13;
 
- EN_DIAMETER    = 0;    # Link parameters 
- EN_LENGTH      = 1;
- EN_ROUGHNESS   = 2;
- EN_MINORLOSS   = 3;
- EN_INITSTATUS  = 4;
- EN_INITSETTING = 5;
- EN_KBULK       = 6;
- EN_KWALL       = 7;
- EN_FLOW        = 8;
- EN_VELOCITY    = 9;
- EN_HEADLOSS    = 10;
- EN_STATUS      = 11;
- EN_SETTING     = 12;
- EN_ENERGY      = 13;
+EN_DURATION     = 0;  # Time parameters 
+EN_HYDSTEP      = 1;
+EN_QUALSTEP     = 2;
+EN_PATTERNSTEP  = 3;
+EN_PATTERNSTART = 4;
+EN_REPORTSTEP   = 5;
+EN_REPORTSTART  = 6;
+EN_RULESTEP     = 7;
+EN_STATISTIC    = 8;
+EN_PERIODS      = 9;
 
- EN_DURATION     = 0;  # Time parameters 
- EN_HYDSTEP      = 1;
- EN_QUALSTEP     = 2;
- EN_PATTERNSTEP  = 3;
- EN_PATTERNSTART = 4;
- EN_REPORTSTEP   = 5;
- EN_REPORTSTART  = 6;
- EN_RULESTEP     = 7;
- EN_STATISTIC    = 8;
- EN_PERIODS      = 9;
+struct __count 
+    EN_NODECOUNT::Int
+    EN_TANKCOUNT::Int
+    EN_LINKCOUNT::Int
+    EN_PATCOUNT::Int
+    EN_CURVECOUNT::Int
+    EN_CONTROLCOUNT::Int
+end
+COUNT = __count(0, 1, 2, 3, 4, 5)
 
- EN_NODECOUNT    = 0; # Component counts 
- EN_TANKCOUNT    = 1;
- EN_LINKCOUNT    = 2;
- EN_PATCOUNT     = 3;
- EN_CURVECOUNT   = 4;
- EN_CONTROLCOUNT = 5;
+EN_JUNCTION   = 0;   # Node types 
+EN_RESERVOIR  = 1;
+EN_TANK       = 2;
 
- EN_JUNCTION   = 0;   # Node types 
- EN_RESERVOIR  = 1;
- EN_TANK       = 2;
+EN_CVPIPE     = 0;   # Link types 
+EN_PIPE       = 1;
+EN_PUMP       = 2;
+EN_PRV        = 3;
+EN_PSV        = 4;
+EN_PBV        = 5;
+EN_FCV        = 6;
+EN_TCV        = 7;
+EN_GPV        = 8;
 
- EN_CVPIPE     = 0;   # Link types 
- EN_PIPE       = 1;
- EN_PUMP       = 2;
- EN_PRV        = 3;
- EN_PSV        = 4;
- EN_PBV        = 5;
- EN_FCV        = 6;
- EN_TCV        = 7;
- EN_GPV        = 8;
+EN_NONE       = 0;   # Quality analysis types 
+EN_CHEM       = 1;
+EN_AGE        = 2;
+EN_TRACE      = 3;
 
- EN_NONE       = 0;   # Quality analysis types 
- EN_CHEM       = 1;
- EN_AGE        = 2;
- EN_TRACE      = 3;
+EN_CONCEN     = 0;   # Source quality types 
+EN_MASS       = 1;
+EN_SETPOINT   = 2;
+EN_FLOWPACED  = 3;
 
- EN_CONCEN     = 0;   # Source quality types 
- EN_MASS       = 1;
- EN_SETPOINT   = 2;
- EN_FLOWPACED  = 3;
+EN_CFS        = 0;   # Flow units types 
+EN_GPM        = 1;
+EN_MGD        = 2;
+EN_IMGD       = 3;
+EN_AFD        = 4;
+EN_LPS        = 5;
+EN_LPM        = 6;
+EN_MLD        = 7;
+EN_CMH        = 8;
+EN_CMD        = 9;
 
- EN_CFS        = 0;   # Flow units types 
- EN_GPM        = 1;
- EN_MGD        = 2;
- EN_IMGD       = 3;
- EN_AFD        = 4;
- EN_LPS        = 5;
- EN_LPM        = 6;
- EN_MLD        = 7;
- EN_CMH        = 8;
- EN_CMD        = 9;
+EN_TRIALS     = 0;   # Option types 
+EN_ACCURACY   = 1;
+EN_TOLERANCE  = 2;
+EN_EMITEXPON  = 3;
+EN_DEMANDMULT = 4;
 
- EN_TRIALS     = 0;   # Option types 
- EN_ACCURACY   = 1;
- EN_TOLERANCE  = 2;
- EN_EMITEXPON  = 3;
- EN_DEMANDMULT = 4;
+EN_LOWLEVEL   = 0;   # Control types 
+EN_HILEVEL    = 1;
+EN_TIMER      = 2;
+EN_TIMEOFDAY  = 3;
 
- EN_LOWLEVEL   = 0;   # Control types 
- EN_HILEVEL    = 1;
- EN_TIMER      = 2;
- EN_TIMEOFDAY  = 3;
+EN_AVERAGE    = 1;   # Time statistic types 
+EN_MINIMUM    = 2; 
+EN_MAXIMUM    = 3;
+EN_RANGE      = 4;
 
- EN_AVERAGE    = 1;   # Time statistic types 
- EN_MINIMUM    = 2; 
- EN_MAXIMUM    = 3;
- EN_RANGE      = 4;
+EN_MIX1       = 0;   # Tank mixing models 
+EN_MIX2       = 1;
+EN_FIFO       = 2;
+EN_LIFO       = 3;
 
- EN_MIX1       = 0;   # Tank mixing models 
- EN_MIX2       = 1;
- EN_FIFO       = 2;
- EN_LIFO       = 3;
-
- EN_NOSAVE     = 0;   # Save-results-to-file flag 
- EN_SAVE       = 1;
- EN_INITFLOW   = 10;  # Re-initialize flow flag 
+EN_NOSAVE     = 0;   # Save-results-to-file flag 
+EN_SAVE       = 1;
+EN_INITFLOW   = 10;  # Re-initialize flow flag 
 
 end #end module
 
