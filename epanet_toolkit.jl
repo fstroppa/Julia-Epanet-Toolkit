@@ -523,88 +523,137 @@ function getEpanetErrorMessage(error)
     error ≠ 0 ? ENgeterror(error) : nothing
 end
 
+function getDictOfNodeIndexes()
+    # Open for suggestions for a more elegant solution.
+    """Generates a dictionary of all nodes indexes"""
+    nodes = Dict(NODE_TYPE.JUNCTION => [],
+                NODE_TYPE.RESERVOIR => [],
+                NODE_TYPE.TANK => [])
+    index = 0
+    while lengthOfArraysOfDict(nodes) < ENgetcount(COUNT.NODE)
+        if typeof(ENgetnodetype(index)) <: Real
+            append!(nodes[ENgetnodetype(index)], index)
+        end
+        index += 1
+    end
+    return nodes
+end
+
+function getDictOfLinkIndexes()
+    links = Dict(LINK_TYPE.CVPIPE => [],
+                LINK_TYPE.PIPE => [],
+                LINK_TYPE.PUMP => [],
+                LINK_TYPE.PRV => [],
+                LINK_TYPE.PSV => [],
+                LINK_TYPE.PBV => [],
+                LINK_TYPE.FCV => [],
+                LINK_TYPE.TCV => [],
+                LINK_TYPE.GPV => [])
+    index = 0
+    while lengthOfArraysOfDict(links) < ENgetcount(COUNT.LINK)
+        if typeof(ENgetlinktype(index)) <: Real
+            append!(links[ENgetlinktype(index)], index)
+        end
+        index += 1
+    end
+    return links
+end
+
+lengthOfArraysOfDict(dict::Dict) = sum([length(dict[key]) for key in keys(dict)])
 
 """ These are codes used by the DLL functions """
 
 struct __node_parameters
-    EN_ELEVATION::Int
-    EN_BASEDEMAND::Int
-    EN_PATTERN::Int
-    EN_EMITTER::Int
-    EN_INITQUAL::Int
-    EN_SOURCEQUAL::Int
-    EN_SOURCEPAT::Int
-    EN_SOURCETYPE::Int
-    EN_TANKLEVEL::Int
-    EN_DEMAND::Int
-    EN_HEAD::Int
-    EN_PRESSURE::Int
-    EN_QUALITY::Int
-    EN_SOURCEMASS::Int
-    EN_INITVOLUME::Int
-    EN_MIXMODEL::Int
-    EN_MIXZONEVOL::Int
-    EN_TANKDIAM::Int
-    EN_MINVOLUME::Int
-    EN_VOLCURVE::Int
-    EN_MINLEVEL::Int
-    EN_MAXLEVEL::Int
-    EN_MIXFRACTION::Int
-    EN_TANK_KBULK::Int
+    ELEVATION::Int
+    BASEDEMAND::Int
+    PATTERN::Int
+    EMITTER::Int
+    INITQUAL::Int
+    SOURCEQUAL::Int
+    SOURCEPAT::Int
+    SOURCETYPE::Int
+    TANKLEVEL::Int
+    DEMAND::Int
+    HEAD::Int
+    PRESSURE::Int
+    QUALITY::Int
+    SOURCEMASS::Int
+    INITVOLUME::Int
+    MIXMODEL::Int
+    MIXZONEVOL::Int
+    TANKDIAM::Int
+    MINVOLUME::Int
+    VOLCURVE::Int
+    MINLEVEL::Int
+    MAXLEVEL::Int
+    MIXFRACTION::Int
+    TANK_KBULK::Int
 end
 # Open for suggestions for a more elegant solution.
 NODE_PARAMETER = __node_parameters(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13
                                     , 14, 15, 16, 17, 18, 19, 20, 21, 22, 23)
-                                    
-EN_DIAMETER    = 0;    # Link parameters 
-EN_LENGTH      = 1;
-EN_ROUGHNESS   = 2;
-EN_MINORLOSS   = 3;
-EN_INITSTATUS  = 4;
-EN_INITSETTING = 5;
-EN_KBULK       = 6;
-EN_KWALL       = 7;
-EN_FLOW        = 8;
-EN_VELOCITY    = 9;
-EN_HEADLOSS    = 10;
-EN_STATUS      = 11;
-EN_SETTING     = 12;
-EN_ENERGY      = 13;
-
-EN_DURATION     = 0;  # Time parameters 
-EN_HYDSTEP      = 1;
-EN_QUALSTEP     = 2;
-EN_PATTERNSTEP  = 3;
-EN_PATTERNSTART = 4;
-EN_REPORTSTEP   = 5;
-EN_REPORTSTART  = 6;
-EN_RULESTEP     = 7;
-EN_STATISTIC    = 8;
-EN_PERIODS      = 9;
+             
+struct __link_parameters
+    DIAMETER::Int
+    LENGTH::Int
+    ROUGHNESS::Int
+    MINORLOSS::Int
+    INITSTATUS::Int
+    INITSETTING::Int
+    KBULK::Int
+    KWALL::Int
+    FLOW::Int
+    VELOCITY::Int
+    HEADLOSS::Int
+    STATUS::Int
+    SETTING::Int
+    ENERGY::Int
+end
+LINK_PARAMETER = __link_parameters(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13)
+ 
+struct __time_parameters
+    DURATION::Int
+    HYDSTEP::Int
+    QUALSTEP::Int
+    PATTERNSTEP::Int
+    PATTERNSTART::Int
+    REPORTSTEP::Int
+    REPORTSTART::Int
+    RULESTEP::Int
+    STATISTIC::Int
+    PERIODS::Int
+end
+TIME_PARAMETER = __time_parameters(0, 1, 2, 3, 4, 5, 6, 7, 8, 9)
 
 struct __count 
-    EN_NODECOUNT::Int
-    EN_TANKCOUNT::Int
-    EN_LINKCOUNT::Int
-    EN_PATCOUNT::Int
-    EN_CURVECOUNT::Int
-    EN_CONTROLCOUNT::Int
+    NODE::Int
+    TANK::Int
+    LINK::Int
+    PAT::Int
+    CURVE::Int
+    CONTROL::Int
 end
 COUNT = __count(0, 1, 2, 3, 4, 5)
 
-EN_JUNCTION   = 0;   # Node types 
-EN_RESERVOIR  = 1;
-EN_TANK       = 2;
+struct __node_type
+    JUNCTION::Int
+    RESERVOIR::Int
+    TANK::Int
+end
+NODE_TYPE = __node_type(0, 1, 2)
 
-EN_CVPIPE     = 0;   # Link types 
-EN_PIPE       = 1;
-EN_PUMP       = 2;
-EN_PRV        = 3;
-EN_PSV        = 4;
-EN_PBV        = 5;
-EN_FCV        = 6;
-EN_TCV        = 7;
-EN_GPV        = 8;
+struct __link_type
+    CVPIPE::Int
+    PIPE::Int
+    PUMP::Int
+    PRV::Int
+    PSV::Int
+    PBV::Int
+    FCV::Int
+    TCV::Int
+    GPV::Int
+end
+LINK_TYPE = __link_type(0, 1, 2, 3, 4, 5, 6, 7, 8)
 
 EN_NONE       = 0;   # Quality analysis types 
 EN_CHEM       = 1;

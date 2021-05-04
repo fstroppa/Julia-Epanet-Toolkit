@@ -76,42 +76,96 @@ end
 
     @testset "Count" begin
         initialize_epanet()
-        @test Epanet.ENgetcount(Epanet.COUNT.EN_NODECOUNT) == 97
-        @test Epanet.ENgetcount(Epanet.COUNT.EN_TANKCOUNT) == 5
-        @test Epanet.ENgetcount(Epanet.COUNT.EN_LINKCOUNT) == 119
-        @test Epanet.ENgetcount(Epanet.COUNT.EN_PATCOUNT) == 5
-        @test Epanet.ENgetcount(Epanet.COUNT.EN_CURVECOUNT) == 2
-        @test Epanet.ENgetcount(Epanet.COUNT.EN_CONTROLCOUNT) == 18
+        @test Epanet.ENgetcount(Epanet.COUNT.NODE) == 97
+        @test Epanet.ENgetcount(Epanet.COUNT.TANK) == 5
+        @test Epanet.ENgetcount(Epanet.COUNT.LINK) == 119
+        @test Epanet.ENgetcount(Epanet.COUNT.PAT) == 5
+        @test Epanet.ENgetcount(Epanet.COUNT.CURVE) == 2
+        @test Epanet.ENgetcount(Epanet.COUNT.CONTROL) == 18
         @test Epanet.ENgetcount(-999) == "Error 251: function call contains invalid parameter code"
         close_epanet()
     end
 
     @testset "Node Parameters" begin
         initialize_epanet()
-        @test Epanet.ENgetnodevalue(1, Epanet.NODE_PARAMETER.EN_ELEVATION) == 147
-        @test Epanet.ENgetnodevalue(1, Epanet.NODE_PARAMETER.EN_BASEDEMAND) == 0
-        @test Epanet.ENgetnodevalue(1, Epanet.NODE_PARAMETER.EN_PATTERN) == 1
-        @test Epanet.ENgetnodevalue(1, Epanet.NODE_PARAMETER.EN_EMITTER) == 0
-        @test Epanet.ENgetnodevalue(1, Epanet.NODE_PARAMETER.EN_INITQUAL) == 0
-        @test Epanet.ENgetnodevalue(1, Epanet.NODE_PARAMETER.EN_SOURCEQUAL) == "Error 240: function call contains nonexistent source"
-        @test Epanet.ENgetnodevalue(1, Epanet.NODE_PARAMETER.EN_SOURCEPAT) == "Error 240: function call contains nonexistent source"
-        @test Epanet.ENgetnodevalue(1, Epanet.NODE_PARAMETER.EN_SOURCETYPE) == "Error 240: function call contains nonexistent source"
-        @test Epanet.ENgetnodevalue(1, Epanet.NODE_PARAMETER.EN_TANKLEVEL) == 0
-        @test Epanet.ENgetnodevalue(1, Epanet.NODE_PARAMETER.EN_DEMAND) == 0
-        @test Epanet.ENgetnodevalue(1, Epanet.NODE_PARAMETER.EN_HEAD) ≈ 145.52339
-        @test Epanet.ENgetnodevalue(1, Epanet.NODE_PARAMETER.EN_PRESSURE) ≈ -0.63981503
-        @test Epanet.ENgetnodevalue(1, Epanet.NODE_PARAMETER.EN_QUALITY) == 0
-        @test Epanet.ENgetnodevalue(1, Epanet.NODE_PARAMETER.EN_SOURCEMASS) == "Error 240: function call contains nonexistent source"
-        @test Epanet.ENgetnodevalue(1, Epanet.NODE_PARAMETER.EN_INITVOLUME) == 0
-        @test Epanet.ENgetnodevalue(1, Epanet.NODE_PARAMETER.EN_MIXMODEL) == 0
-        @test Epanet.ENgetnodevalue(1, Epanet.NODE_PARAMETER.EN_MIXZONEVOL) == 0
-        @test Epanet.ENgetnodevalue(1, Epanet.NODE_PARAMETER.EN_TANKDIAM) == 0
-        @test Epanet.ENgetnodevalue(1, Epanet.NODE_PARAMETER.EN_MINVOLUME) == 0
-        @test Epanet.ENgetnodevalue(1, Epanet.NODE_PARAMETER.EN_VOLCURVE) == 0
-        @test Epanet.ENgetnodevalue(1, Epanet.NODE_PARAMETER.EN_MINLEVEL) == 0
-        @test Epanet.ENgetnodevalue(1, Epanet.NODE_PARAMETER.EN_MAXLEVEL) == 0
-        @test Epanet.ENgetnodevalue(1, Epanet.NODE_PARAMETER.EN_MIXFRACTION) == 1
-        @test Epanet.ENgetnodevalue(1, Epanet.NODE_PARAMETER.EN_TANK_KBULK) == 0
+        @test Epanet.ENgetnodevalue(1, Epanet.NODE_PARAMETER.ELEVATION) == 147
+        @test Epanet.ENgetnodevalue(1, Epanet.NODE_PARAMETER.BASEDEMAND) == 0
+        @test Epanet.ENgetnodevalue(1, Epanet.NODE_PARAMETER.PATTERN) == 1
+        @test Epanet.ENgetnodevalue(1, Epanet.NODE_PARAMETER.EMITTER) == 0
+        @test Epanet.ENgetnodevalue(1, Epanet.NODE_PARAMETER.INITQUAL) == 0
+        @test Epanet.ENgetnodevalue(1, Epanet.NODE_PARAMETER.SOURCEQUAL) == "Error 240: function call contains nonexistent source"
+        @test Epanet.ENgetnodevalue(1, Epanet.NODE_PARAMETER.SOURCEPAT) == "Error 240: function call contains nonexistent source"
+        @test Epanet.ENgetnodevalue(1, Epanet.NODE_PARAMETER.SOURCETYPE) == "Error 240: function call contains nonexistent source"
+        @test Epanet.ENgetnodevalue(1, Epanet.NODE_PARAMETER.TANKLEVEL) == 0
+        @test Epanet.ENgetnodevalue(1, Epanet.NODE_PARAMETER.DEMAND) == 0
+        @test Epanet.ENgetnodevalue(1, Epanet.NODE_PARAMETER.HEAD) ≈ 145.52339
+        @test Epanet.ENgetnodevalue(1, Epanet.NODE_PARAMETER.PRESSURE) ≈ -0.63981503
+        @test Epanet.ENgetnodevalue(1, Epanet.NODE_PARAMETER.QUALITY) == 0
+        @test Epanet.ENgetnodevalue(1, Epanet.NODE_PARAMETER.SOURCEMASS) == "Error 240: function call contains nonexistent source"
+        @test Epanet.ENgetnodevalue(1, Epanet.NODE_PARAMETER.INITVOLUME) == 0
+        @test Epanet.ENgetnodevalue(1, Epanet.NODE_PARAMETER.MIXMODEL) == 0
+        @test Epanet.ENgetnodevalue(1, Epanet.NODE_PARAMETER.MIXZONEVOL) == 0
+        @test Epanet.ENgetnodevalue(1, Epanet.NODE_PARAMETER.TANKDIAM) == 0
+        @test Epanet.ENgetnodevalue(1, Epanet.NODE_PARAMETER.MINVOLUME) == 0
+        @test Epanet.ENgetnodevalue(1, Epanet.NODE_PARAMETER.VOLCURVE) == 0
+        @test Epanet.ENgetnodevalue(1, Epanet.NODE_PARAMETER.MINLEVEL) == 0
+        @test Epanet.ENgetnodevalue(1, Epanet.NODE_PARAMETER.MAXLEVEL) == 0
+        @test Epanet.ENgetnodevalue(1, Epanet.NODE_PARAMETER.MIXFRACTION) == 1
+        @test Epanet.ENgetnodevalue(1, Epanet.NODE_PARAMETER.TANK_KBULK) == 0
+        close_epanet()
+    end
+
+    @testset "Link Parameters" begin
+        initialize_epanet()
+        @test Epanet.ENgetlinkvalue(1, Epanet.LINK_PARAMETER.DIAMETER) == 99
+        @test Epanet.ENgetlinkvalue(1, Epanet.LINK_PARAMETER.LENGTH) == 99
+        @test Epanet.ENgetlinkvalue(1, Epanet.LINK_PARAMETER.ROUGHNESS) == 199
+        @test Epanet.ENgetlinkvalue(1, Epanet.LINK_PARAMETER.MINORLOSS) == 0
+        @test Epanet.ENgetlinkvalue(1, Epanet.LINK_PARAMETER.INITSTATUS) == 1
+        @test Epanet.ENgetlinkvalue(1, Epanet.LINK_PARAMETER.INITSETTING) == 199
+        @test Epanet.ENgetlinkvalue(1, Epanet.LINK_PARAMETER.KBULK) == 0
+        @test Epanet.ENgetlinkvalue(1, Epanet.LINK_PARAMETER.KWALL) == 0
+        @test Epanet.ENgetlinkvalue(1, Epanet.LINK_PARAMETER.FLOW) ≈ -2246.2974
+        @test Epanet.ENgetlinkvalue(1, Epanet.LINK_PARAMETER.VELOCITY) ≈ 0.0936
+        @test Epanet.ENgetlinkvalue(1, Epanet.LINK_PARAMETER.HEADLOSS) ≈ 1.7537064*10e-6
+        @test Epanet.ENgetlinkvalue(1, Epanet.LINK_PARAMETER.STATUS) == 1
+        @test Epanet.ENgetlinkvalue(1, Epanet.LINK_PARAMETER.SETTING) == 199
+        @test Epanet.ENgetlinkvalue(1, Epanet.LINK_PARAMETER.DIAMETER) == 99
+        @test Epanet.ENgetlinkvalue(1, Epanet.LINK_PARAMETER.ENERGY) ≈ 7.4256145*10e-7
+        @test Epanet.ENgetlinkvalue(100, Epanet.LINK_PARAMETER.DIAMETER) == 8
+        close_epanet()
+    end
+
+    @testset "Time parameters" begin
+        initialize_epanet()
+        @test Epanet.ENgettimeparam(Epanet.TIME_PARAMETER.DURATION) == 604800
+        @test Epanet.ENgettimeparam(Epanet.TIME_PARAMETER.HYDSTEP) == 900
+        @test Epanet.ENgettimeparam(Epanet.TIME_PARAMETER.QUALSTEP) == 900
+        @test Epanet.ENgettimeparam(Epanet.TIME_PARAMETER.PATTERNSTEP) == 3600
+        @test Epanet.ENgettimeparam(Epanet.TIME_PARAMETER.PATTERNSTART) == 0
+        @test Epanet.ENgettimeparam(Epanet.TIME_PARAMETER.REPORTSTEP) == 900
+        @test Epanet.ENgettimeparam(Epanet.TIME_PARAMETER.REPORTSTART) == 0
+        @test Epanet.ENgettimeparam(Epanet.TIME_PARAMETER.RULESTEP) == 90
+        @test Epanet.ENgettimeparam(Epanet.TIME_PARAMETER.STATISTIC) == 0
+        @test Epanet.ENgettimeparam(Epanet.TIME_PARAMETER.PERIODS) == 0
+        close_epanet()
+    end
+
+    @testset "Node Types" begin
+        initialize_epanet()
+        @test Epanet.ENgetnodetype(1) == Epanet.NODE_TYPE.JUNCTION
+        @test Epanet.ENgetnodetype(93) == Epanet.NODE_TYPE.RESERVOIR
+        @test Epanet.ENgetnodetype(95) == Epanet.NODE_TYPE.TANK
+        @test Epanet.ENgetnodetype(-999) == "Error 203: function call contains undefined node"
+        close_epanet()
+    end
+
+    @testset "Link Types" begin
+        initialize_epanet()
+        @test Epanet.ENgetlinktype(1) == Epanet.LINK_TYPE.PIPE
+        @test Epanet.ENgetlinktype(93) == Epanet.LINK_TYPE.PIPE
+        @test Epanet.ENgetlinktype(119) == Epanet.LINK_TYPE.PUMP
+        @test Epanet.ENgetlinktype(-999) == "Error 204: function call contains undefined link"
         close_epanet()
     end
 
@@ -135,3 +189,4 @@ end
         close_epanet()
     end
 end
+
