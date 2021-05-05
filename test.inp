@@ -1,5 +1,5 @@
 [TITLE]
-EPANET Example Network 3, updated to include longer duration
+EPANET Example Network 3
 Example showing how the percent of Lake water in a dual-source 
 system changes over time.
 
@@ -371,18 +371,6 @@ system changes over time.
 [CONTROLS]
  LINK 10 1.0000 AT TIME 1.0000 HOURS
  LINK 10 0.0000 AT TIME 15.0000 HOURS
- LINK 10 1.0000 AT TIME 25.0000 HOURS
- LINK 10 0.0000 AT TIME 39.0000 HOURS
- LINK 10 1.0000 AT TIME 49.0000 HOURS
- LINK 10 0.0000 AT TIME 63.0000 HOURS
- LINK 10 1.0000 AT TIME 73.0000 HOURS
- LINK 10 0.0000 AT TIME 87.0000 HOURS
- LINK 10 1.0000 AT TIME 97.0000 HOURS
- LINK 10 0.0000 AT TIME 111.0000 HOURS
- LINK 10 1.0000 AT TIME 121.0000 HOURS
- LINK 10 0.0000 AT TIME 135.0000 HOURS
- LINK 10 1.0000 AT TIME 145.0000 HOURS
- LINK 10 0.0000 AT TIME 159.0000 HOURS
  LINK 335 1.0000 IF NODE 1 BELOW 17.1000
  LINK 335 0.0000 IF NODE 1 ABOVE 19.1000
  LINK 330 closed  IF NODE 1 BELOW 17.1000
@@ -400,9 +388,9 @@ system changes over time.
  3                               MIXED          1.0000
 
 [REACTIONS]
- ORDER  BULK            0.00
- ORDER  WALL            0
- ORDER  TANK            0.00
+ ORDER  BULK            1.00
+ ORDER  WALL            1
+ ORDER  TANK            1.00
  GLOBAL BULK            0.000000
  GLOBAL WALL            0.000000
 
@@ -411,14 +399,14 @@ system changes over time.
  DEMAND CHARGE       0.0000
 
 [TIMES]
- DURATION            168:00:00
- HYDRAULIC TIMESTEP  0:15:00
- QUALITY TIMESTEP    0:15:00
- REPORT TIMESTEP     0:15:00
+ DURATION            24:00:00
+ HYDRAULIC TIMESTEP  1:00:00
+ QUALITY TIMESTEP    0:05:00
+ REPORT TIMESTEP     1:00:00
  REPORT START        0:00:00
  PATTERN TIMESTEP    1:00:00
  PATTERN START       0:00:00
- RULE TIMESTEP       0:01:30
+ RULE TIMESTEP       0:06:00
  START CLOCKTIME     0:00:00
  STATISTIC           NONE
 
@@ -427,7 +415,7 @@ system changes over time.
  PRESSURE            PSI
  HEADLOSS            H-W
  UNBALANCED          CONTINUE 10
- QUALITY             Chemical mg/L
+ QUALITY             TRACE Lake                           
  DEMAND MULTIPLIER   1.0000
  EMITTER EXPONENT    0.5000
  VISCOSITY           1.000000
@@ -508,7 +496,6 @@ system changes over time.
  169                                  25.680000      12.740000
  171                                  26.650000      11.800000
  173                                  26.870000      11.590000
- 177                                  25.710000      10.570000
  179                                  25.710000      10.400000
  181                                  25.720000      10.740000
  183                                  25.450000      10.180000
@@ -544,7 +531,7 @@ system changes over time.
  247                                  35.020000       2.050000
  249                                  35.020000       1.810000
  251                                  34.150000       1.100000
- 253                                  32.170000       1.880000
+ 253                                  32.168000       1.885000
  255                                  33.510000       2.450000
  257                                  21.170000      23.320000
  259                                  20.800000      23.400000
@@ -567,12 +554,12 @@ system changes over time.
 [TAGS]
 
 [LABELS]
-;X-Coord           Y-Coord          Label & Anchor Node
- 8.00             29.42            "LAKE"                 
- 25.00            31.10            "RIVER"                 
+;X-Coord             Y-Coord             Label & Anchor Node
+8.000             	29.418            	"LAKE"	
+25.000            	31.100            	"RIVER"	
 
 [BACKDROP]
- DIMENSIONS     	6.16            	-1.55           	46.70           	32.61           
+  DIMENSIONS  	6.157             	-1.553            	46.703            	32.613            
  UNITS          	None
  FILE           	
  OFFSET         	0.00            	0.00            

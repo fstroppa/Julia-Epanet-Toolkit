@@ -23,28 +23,28 @@ function ENepanet(inp_file::String, rpt_file::String="", out_file::String="", vf
     """
     sym = Libdl.dlsym(lib, :ENepanet)
     error = ccall(sym, Cint, (Cstring, Cstring, Cstring, Cptrdiff_t), inp_file, rpt_file, out_file, vfunc)
-    return getEpanetErrorMessage(error)
+    return error ≠ 0 ? _throwEpanetException(error) : nothing
 end
 
 function ENopen(inp_file::String, rpt_file::String = "", out_file::String = "")
     """Opens an EPANET input file & reads in network data."""
     sym = Libdl.dlsym(lib, :ENopen)
     error = ccall(sym, Cint, (Cstring, Cstring, Cstring), inp_file, rpt_file, out_file)
-    return getEpanetErrorMessage(error)
+    return error ≠ 0 ? _throwEpanetException(error) : nothing
 end
 
 function ENsaveinpfile(file::String)
     """Saves a project's data to an EPANET-formatted text file (.inp)."""
     sym = Libdl.dlsym(lib, :ENsaveinpfile)
     error = ccall(sym, Cint, (Cstring,), file)
-    return getEpanetErrorMessage(error)
+    return error ≠ 0 ? _throwEpanetException(error) : nothing
 end
 
 function ENclose()
     """Closes a project and frees all of its memory."""
     sym = Libdl.dlsym(lib, :ENclose)
     error = ccall(sym, Cint, ())
-    return getEpanetErrorMessage(error)
+    return error ≠ 0 ? _throwEpanetException(error) : nothing
 end
 
 function ENsolveH()
@@ -53,7 +53,7 @@ function ENsolveH()
     hidraulic analyses are made in the same network"""
     sym = Libdl.dlsym(lib, :ENsolveH)
     error = ccall(sym, Cint, ())
-    return getEpanetErrorMessage(error)
+    return error ≠ 0 ? _throwEpanetException(error) : nothing
 end
 
 function ENsaveH()
@@ -61,14 +61,14 @@ function ENsaveH()
     binary output file, where results are only reported at uniform reporting intervals."""
     sym = Libdl.dlsym(lib, :ENsaveH)
     error = ccall(sym, Cint, ())
-    return getEpanetErrorMessage(error)
+    return error ≠ 0 ? _throwEpanetException(error) : nothing
 end
 
 function ENopenH()
     """Opens a project's hydraulic solver."""
     sym = Libdl.dlsym(lib, :ENopenH)
     error = ccall(sym, Cint, ())
-    return getEpanetErrorMessage(error)
+    return error ≠ 0 ? _throwEpanetException(error) : nothing
 end
 
 function ENinitH(initialization_flag::Int = 0)
@@ -79,7 +79,7 @@ function ENinitH(initialization_flag::Int = 0)
     be saved to a temporary binary hydraulics file (1) or not (0)."""
     sym = Libdl.dlsym(lib, :ENinitH)
     error = ccall(sym, Cint, (Cint,), initialization_flag)
-    return getEpanetErrorMessage(error)
+    return error ≠ 0 ? _throwEpanetException(error) : nothing
 end
 
 function ENrunH()
@@ -89,7 +89,7 @@ function ENrunH()
     current_time::Ref{Int32} = 0
     sym = Libdl.dlsym(lib, :ENrunH)
     error = ccall(sym, Cint, (Ref{Int32},), current_time)
-    return error ≠ 0 ? getEpanetErrorMessage(error) : current_time[]
+    return error ≠ 0 ? _throwEpanetException(error) : current_time[]
 end
 
 function ENnextH()
@@ -111,28 +111,28 @@ function ENnextH()
     time_step::Ref{Int32} = 0
     sym = Libdl.dlsym(lib, :ENnextH)
     error = ccall(sym, Cint, (Ref{Int32},), time_step)
-    return error ≠ 0 ? getEpanetErrorMessage(error) : time_step[]
+    return error ≠ 0 ? _throwEpanetException(error) : time_step[]
 end
 
 function ENcloseH()
     """Closes the hydraulic solver freeing all of its allocated memory."""
     sym = Libdl.dlsym(lib, :ENcloseH)
     error = ccall(sym, Cint, ())
-    return getEpanetErrorMessage(error)
+    return error ≠ 0 ? _throwEpanetException(error) : nothing
 end
 
 function ENsavehydfile(file::String)
     """Saves a project's temporary hydraulics file to disk."""
     sym = Libdl.dlsym(lib, :ENsavehydfile)
     error = ccall(sym, Cint, (Cstring,), file)
-    return getEpanetErrorMessage(error)
+    return error ≠ 0 ? _throwEpanetException(error) : nothing
 end
 
 function ENusehydfile(file::String)
     """Uses a previously saved binary hydraulics file to supply a project's hydraulics."""
     sym = Libdl.dlsym(lib, :ENusehydfile)
     error = ccall(sym, Cint, (Cstring,), file)
-    return getEpanetErrorMessage(error)
+    return error ≠ 0 ? _throwEpanetException(error) : nothing
 end
 
 function ENsolveQ()
@@ -140,14 +140,14 @@ function ENsolveQ()
     written to the project's binary output file."""
     sym = Libdl.dlsym(lib, :ENsolveQ)
     error = ccall(sym, Cint, ())
-    return getEpanetErrorMessage(error)
+    return error ≠ 0 ? _throwEpanetException(error) : nothing
 end
 
 function ENopenQ()
     """Opens a project's water quality solver."""
     sym = Libdl.dlsym(lib, :ENopenQ)
     error = ccall(sym, Cint, ())
-    return getEpanetErrorMessage(error)
+    return error ≠ 0 ? _throwEpanetException(error) : nothing
 end
 
 function ENinitQ(initialization_flag::Int = 0)
@@ -157,7 +157,7 @@ function ENinitQ(initialization_flag::Int = 0)
     be saved to a temporary binary hydraulics file (1) or not (0)."""
     sym = Libdl.dlsym(lib, :ENinitQ)
     error = ccall(sym, Cint, (Cint,), initialization_flag)
-    return getEpanetErrorMessage(error)
+    return error ≠ 0 ? _throwEpanetException(error) : nothing
 end
 
 function ENrunQ()
@@ -168,7 +168,7 @@ function ENrunQ()
     current_time::Ref{Int32} = 0
     sym = Libdl.dlsym(lib, :ENrunQ)
     error = ccall(sym, Cint, (Ref{Int32},), current_time)
-    return error ≠ 0 ? getEpanetErrorMessage(error) : current_time[]
+    return error ≠ 0 ? _throwEpanetException(error) : current_time[]
 end
 
 function ENnextQ()
@@ -191,7 +191,7 @@ function ENnextQ()
     time_step::Ref{Int32} = 0
     sym = Libdl.dlsym(lib, :ENnextQ)
     error = ccall(sym, Cint, (Ref{Int32},), time_step)
-    return error ≠ 0 ? getEpanetErrorMessage(error) : time_step[]
+    return error ≠ 0 ? _throwEpanetException(error) : time_step[]
 end
 
 function ENstepQ()
@@ -199,21 +199,21 @@ function ENstepQ()
     time_left::Ref{Int32} = 0
     sym = Libdl.dlsym(lib, :ENstepQ)
     error = ccall(sym, Cint, (Ref{Int32},), time_left)
-    return error ≠ 0 ? getEpanetErrorMessage(error) : time_left[]
+    return error ≠ 0 ? _throwEpanetException(error) : time_left[]
 end
 
 function ENcloseQ()
     """Closes the water quality solver, freeing all of its allocated memory."""
     sym = Libdl.dlsym(lib, :ENcloseQ)
     error = ccall(sym, Cint, ())
-    return getEpanetErrorMessage(error)
+    return error ≠ 0 ? _throwEpanetException(error) : nothing
 end
 
 function ENwriteline(file::String)
     """Writes a line of text to a project's report file."""
     sym = Libdl.dlsym(lib, :ENwriteline)
     error = ccall(sym, Cint, (Cstring,), file)
-    return getEpanetErrorMessage(error)
+    return error ≠ 0 ? _throwEpanetException(error) : nothing
 end
 
 function ENreport()
@@ -225,21 +225,21 @@ function ENreport()
     The format of the report is controlled by commands issued with EN_setreport."""
     sym = Libdl.dlsym(lib, :ENreport)
     error = ccall(sym, Cint, ())
-    return getEpanetErrorMessage(error)
+    return error ≠ 0 ? _throwEpanetException(error) : nothing
 end
 
 function ENresetreport()
     """Resets a project's report options to their default values."""
     sym = Libdl.dlsym(lib, :ENresetreport)
     error = ccall(sym, Cint, ())
-    return getEpanetErrorMessage(error)
+    return error ≠ 0 ? _throwEpanetException(error) : nothing
 end
 
 function ENsetreport(file::String)
     """Processes a reporting format command."""
     sym = Libdl.dlsym(lib, :ENsetreport)
     error = ccall(sym, Cint, (Cstring,), file)
-    return getEpanetErrorMessage(error)
+    return error ≠ 0 ? _throwEpanetException(error) : nothing
 end
 
 function ENgetcontrol(control_index::Int)
@@ -252,7 +252,7 @@ function ENgetcontrol(control_index::Int)
     sym = Libdl.dlsym(lib, :ENgetcontrol)
     error = ccall(sym, Cint, (Cint, Ref{Int32}, Ref{Int32}, Ref{Float32}, Ref{Int32}, Ref{Float32},),
                 control_index, control_type, link_index, setting, node_index, level)
-    return error ≠ 0 ? getEpanetErrorMessage(error) : (control_type[], link_index[], setting[], node_index[], level[])
+    return error ≠ 0 ? _throwEpanetException(error) : (control_type[], link_index[], setting[], node_index[], level[])
 end
 
 function ENgetcount(element::Int)
@@ -260,7 +260,7 @@ function ENgetcount(element::Int)
     count::Ref{Int32} = 0
     sym = Libdl.dlsym(lib, :ENgetcount)
     error = ccall(sym, Cint, (Cint, Ref{Int32},), element, count)
-    return error ≠ 0 ? getEpanetErrorMessage(error) : count[]
+    return error ≠ 0 ? _throwEpanetException(error) : count[]
 end
 
 function ENgetoption(option::Int)
@@ -268,7 +268,7 @@ function ENgetoption(option::Int)
     value::Ref{Float32} = 0
     sym = Libdl.dlsym(lib, :ENgetoption)
     error = ccall(sym, Cint, (Cint, Ref{Float32},), option, value)
-    return error ≠ 0 ? getEpanetErrorMessage(error) : value[]
+    return error ≠ 0 ? _throwEpanetException(error) : value[]
 end
 
 function ENgettimeparam(parameter::Int)
@@ -276,7 +276,7 @@ function ENgettimeparam(parameter::Int)
     value::Ref{Int64} = 0
     sym = Libdl.dlsym(lib, :ENgettimeparam)
     error = ccall(sym, Cint, (Cint, Ref{Int64},), parameter, value)
-    return error ≠ 0 ? getEpanetErrorMessage(error) : value[]
+    return error ≠ 0 ? _throwEpanetException(error) : value[]
 end
 
 function ENgetflowunits()
@@ -284,7 +284,7 @@ function ENgetflowunits()
     value::Ref{Int32} = 0
     sym = Libdl.dlsym(lib, :ENgetflowunits)
     error = ccall(sym, Cint, (Ref{Int32},), value)
-    return error ≠ 0 ? getEpanetErrorMessage(error) : value[]
+    return error ≠ 0 ? _throwEpanetException(error) : value[]
 end
 
 function ENgetpatternindex(id::String)
@@ -292,7 +292,7 @@ function ENgetpatternindex(id::String)
     index::Ref{Int32} = 0
     sym = Libdl.dlsym(lib, :ENgetpatternindex)
     error = ccall(sym, Cint, (Cstring, Ref{Int32},), id, index)
-    return error ≠ 0 ? getEpanetErrorMessage(error) : index[]
+    return error ≠ 0 ? _throwEpanetException(error) : index[]
 end
 
 function ENgetpatternid(index::Int)
@@ -301,7 +301,7 @@ function ENgetpatternid(index::Int)
     sym = Libdl.dlsym(lib, :ENgetpatternid)
     error = ccall(sym, Cint, (Cint, Cstring,), index, id)
     id = rstrip(id, ['\0', '\n'])
-    return error ≠ 0 ? getEpanetErrorMessage(error) : id
+    return error ≠ 0 ? _throwEpanetException(error) : id
 end
 
 function ENgetpatternlen(index::Int)
@@ -309,7 +309,7 @@ function ENgetpatternlen(index::Int)
     length::Ref{Int32} = 0
     sym = Libdl.dlsym(lib, :ENgetpatternlen)
     error = ccall(sym, Cint, (Cint, Ref{Int32},), index, length)
-    return error ≠ 0 ? getEpanetErrorMessage(error) : length[]
+    return error ≠ 0 ? _throwEpanetException(error) : length[]
 end
 
 function ENgetpatternvalue(index::Int = 1, period::Int = 1)
@@ -317,7 +317,7 @@ function ENgetpatternvalue(index::Int = 1, period::Int = 1)
     value::Ref{Float32} = 0
     sym = Libdl.dlsym(lib, :ENgetpatternvalue)
     error = ccall(sym, Cint, (Cint, Cint, Ref{Float32},), index, period, value)
-    return error ≠ 0 ? getEpanetErrorMessage(error) : value[]
+    return error ≠ 0 ? _throwEpanetException(error) : value[]
 end
 
 function ENgetqualtype()
@@ -326,7 +326,7 @@ function ENgetqualtype()
     trace_node::Ref{Int32} = 0
     sym = Libdl.dlsym(lib, :ENgetqualtype)
     error = ccall(sym, Cint, (Ref{Int32}, Ref{Int32},), qual_type, trace_node)
-    return error ≠ 0 ? getEpanetErrorMessage(error) : (qual_type[], trace_node[])
+    return error ≠ 0 ? _throwEpanetException(error) : (qual_type[], trace_node[])
 end
 
 function ENgeterror(error_code, max_len::Int=127)
@@ -334,7 +334,7 @@ function ENgeterror(error_code, max_len::Int=127)
     sym = Libdl.dlsym(lib, :ENgeterror)
     error = ccall(sym, Cint, (Cint, Cstring, Cint,), error_code, error_message, max_len)
     error_message = rstrip(error_message, ['\0', '\n'])
-    return error ≠ 0 ? getEpanetErrorMessage(error) : error_message
+    return error ≠ 0 ? _throwEpanetException(error) : error_message
 end
 
 function ENgetnodeindex(id::String)
@@ -342,7 +342,7 @@ function ENgetnodeindex(id::String)
     index::Ref{Int32} = 0
     sym = Libdl.dlsym(lib, :ENgetnodeindex)
     error = ccall(sym, Cint, (Cstring, Ref{Int32},), id, index)
-    return error ≠ 0 ? getEpanetErrorMessage(error) : index[]
+    return error ≠ 0 ? _throwEpanetException(error) : index[]
 end
 
 function ENgetnodeid(index::Int)
@@ -351,7 +351,7 @@ function ENgetnodeid(index::Int)
     sym = Libdl.dlsym(lib, :ENgetnodeid)
     error = ccall(sym, Cint, (Cint, Cstring,), index, id)
     id = rstrip(id, ['\0', '\n'])
-    return error ≠ 0 ? getEpanetErrorMessage(error) : id
+    return error ≠ 0 ? _throwEpanetException(error) : id
 end
 
 function ENgetnodetype(index::Int)
@@ -359,7 +359,7 @@ function ENgetnodetype(index::Int)
     node_type::Ref{Int32} = 0
     sym = Libdl.dlsym(lib, :ENgetnodetype)
     error = ccall(sym, Cint, (Cint, Ref{Int32},), index, node_type)
-    return error ≠ 0 ? getEpanetErrorMessage(error) : node_type[]
+    return error ≠ 0 ? _throwEpanetException(error) : node_type[]
 end
 
 function ENgetnodevalue(index::Int, property::Int)
@@ -367,7 +367,7 @@ function ENgetnodevalue(index::Int, property::Int)
     value::Ref{Float32} = 0
     sym = Libdl.dlsym(lib, :ENgetnodevalue)
     error = ccall(sym, Cint, (Cint, Cint, Ref{Float32},), index, property, value)
-    return error ≠ 0 ? getEpanetErrorMessage(error) : value[]
+    return error ≠ 0 ? _throwEpanetException(error) : value[]
 end
 
 function ENgetlinkindex(id::String)
@@ -375,7 +375,7 @@ function ENgetlinkindex(id::String)
     index::Ref{Int32} = 0
     sym = Libdl.dlsym(lib, :ENgetlinkindex)
     error = ccall(sym, Cint, (Cstring, Ref{Int32},), id, index)
-    return error ≠ 0 ? getEpanetErrorMessage(error) : index[]
+    return error ≠ 0 ? _throwEpanetException(error) : index[]
 end
 
 function ENgetlinkid(index::Int)
@@ -384,7 +384,7 @@ function ENgetlinkid(index::Int)
     sym = Libdl.dlsym(lib, :ENgetlinkid)
     error = ccall(sym, Cint, (Cint, Cstring,), index, id)
     id = rstrip(id, ['\0', '\n'])
-    return error ≠ 0 ? getEpanetErrorMessage(error) : id
+    return error ≠ 0 ? _throwEpanetException(error) : id
 end
 
 function ENgetlinktype(index::Int)
@@ -392,7 +392,7 @@ function ENgetlinktype(index::Int)
     link_type::Ref{Int32} = 0
     sym = Libdl.dlsym(lib, :ENgetlinktype)
     error = ccall(sym, Cint, (Cint, Ref{Int32},), index, link_type)
-    return error ≠ 0 ? getEpanetErrorMessage(error) : link_type[]
+    return error ≠ 0 ? _throwEpanetException(error) : link_type[]
 end
 
 function ENgetlinknodes(index::Int)
@@ -401,7 +401,7 @@ function ENgetlinknodes(index::Int)
     node_2_index::Ref{Int32} = 0
     sym = Libdl.dlsym(lib, :ENgetlinknodes)
     error = ccall(sym, Cint, (Cint, Ref{Int32}, Ref{Int32},), index, node_1_index, node_2_index)
-    return error ≠ 0 ? getEpanetErrorMessage(error) : (node_1_index[], node_2_index[])
+    return error ≠ 0 ? _throwEpanetException(error) : (node_1_index[], node_2_index[])
 end
 
 function ENgetlinkvalue(index::Int, property::Int)
@@ -409,7 +409,7 @@ function ENgetlinkvalue(index::Int, property::Int)
     value::Ref{Float32} = 0
     sym = Libdl.dlsym(lib, :ENgetlinkvalue)
     error = ccall(sym, Cint, (Cint, Cint, Ref{Float32},), index, property, value)
-    return error ≠ 0 ? getEpanetErrorMessage(error) : value[]
+    return error ≠ 0 ? _throwEpanetException(error) : value[]
 end
 
 function ENgetversion()
@@ -417,7 +417,7 @@ function ENgetversion()
     version::Ref{Int32} = 0
     sym = Libdl.dlsym(lib, :ENgetversion)
     error = ccall(sym, Cint, (Ref{Int32},), version)
-    return error ≠ 0 ? getEpanetErrorMessage(error) : version[]
+    return error ≠ 0 ? _throwEpanetException(error) : version[]
 end
 
 function ENsetcontrol(control_index::Int, control_type::Int, link_index::Int,
@@ -426,30 +426,31 @@ function ENsetcontrol(control_index::Int, control_type::Int, link_index::Int,
     sym = Libdl.dlsym(lib, :ENsetcontrol)
     error = ccall(sym, Cint, (Cint, Cint, Cint, Cfloat, Cint, Cfloat,), 
             control_index, control_type, link_index, setting, node_index, level)
-    return getEpanetErrorMessage(error)
+    return error ≠ 0 ? _throwEpanetException(error) : nothing
 end
 
 function ENsetnodevalue(index::Int, property::Int, value::Real)
     """Sets a property value for a node."""
     sym = Libdl.dlsym(lib, :ENsetnodevalue)
     error = ccall(sym, Cint, (Cint, Cint, Cfloat,), index, property, value)
-    return getEpanetErrorMessage(error)
+    return error ≠ 0 ? _throwEpanetException(error) : nothing
 end
 
 function ENsetlinkvalue(index::Int, property::Int, value::Real)
     """Sets a property value for a link."""
     sym = Libdl.dlsym(lib, :ENsetlinkvalue)
     error = ccall(sym, Cint, (Cint, Cint, Cfloat,), index, property, value)
-    return getEpanetErrorMessage(error)
+    return error ≠ 0 ? _throwEpanetException(error) : nothing
 end
 
 function ENaddpattern(id::String)
     """Adds a new time pattern to a project."""
     sym = Libdl.dlsym(lib, :ENaddpattern)
     error = ccall(sym, Cint, (Cstring,), id)
-    return getEpanetErrorMessage(error)
+    return error ≠ 0 ? _throwEpanetException(error) : nothing
 end
 
+# TODO: Fix this.
 # function ENsetpattern(index::Int, values::Array)
 #     """WARNING: This function can cause compatibilities issues.
 #     Use ENsetpatternvalue instead!!!
@@ -467,29 +468,26 @@ end
 #     return getEpanetErrorMessage(error)
 # end
 
-# err = ENsetpattern(1, [1.5, 5.4, 3.0]) ## ERROR!
-# err = ENgetpatternlen(1)
-# err = ENgetpatternvalue(1, 2)
 
 function ENsetpatternvalue(index::Int, period::Int, value::Real)
     """Sets a time pattern's factor for a given time period."""
         sym = Libdl.dlsym(lib, :ENsetpatternvalue)
         error = ccall(sym, Cint, (Cint, Cint, Cfloat), index, period, value)
-        return getEpanetErrorMessage(error)
+        return error ≠ 0 ? _throwEpanetException(error) : nothing
 end
 
 function ENsettimeparam(parameter::Int, value::Int)
     """Sets the value of a time parameter."""
     sym = Libdl.dlsym(lib, :ENsettimeparam)
     error = ccall(sym, Cint, (Cint, Clong), parameter, value)
-    return getEpanetErrorMessage(error)
+    return error ≠ 0 ? _throwEpanetException(error) : nothing
 end
 
 function ENsetoption(option::Int, value::Real)
     """Sets the value for an analysis option."""
     sym = Libdl.dlsym(lib, :ENsetoption)
     error = ccall(sym, Cint, (Cint, Cfloat), option, value)
-    return getEpanetErrorMessage(error)
+    return error ≠ 0 ? _throwEpanetException(error) : nothing
 end
 
 function ENsetstatusreport(level_code::Int)
@@ -505,7 +503,7 @@ function ENsetstatusreport(level_code::Int)
     status reporting be turned off (level = EN_NO_REPORT)."""
     sym = Libdl.dlsym(lib, :ENsetstatusreport)
     error = ccall(sym, Cint, (Cint,), level_code)
-    return getEpanetErrorMessage(error)
+    return error ≠ 0 ? _throwEpanetException(error) : nothing
 end
 
 function ENsetqualtype(qual_type::Int, chem_name::String = "",
@@ -514,25 +512,29 @@ function ENsetqualtype(qual_type::Int, chem_name::String = "",
     sym = Libdl.dlsym(lib, :ENsetqualtype)
     error = ccall(sym, Cint, (Cint, Cstring, Cstring, Cstring,),
                  qual_type, chem_name, chem_units, trace_node)
-    return getEpanetErrorMessage(error)
+    return error ≠ 0 ? _throwEpanetException(error) : nothing
 end
 
-""" Functions not present in Epanet"""
+""" Functions and commands not present in Epanet"""
 
-function getEpanetErrorMessage(error)
-    error ≠ 0 ? ENgeterror(error) : nothing
+struct EpanetException <: Exception 
+    message::String
+    EpanetException(message::String) = new(message)
 end
+
+_throwEpanetException(error) = throw(EpanetException(ENgeterror(error)))
 
 function getDictOfNodeIndexes()
     # Open for suggestions for a more elegant solution.
     """Generates a dictionary of all nodes indexes"""
-    nodes = Dict(NODE_TYPE.JUNCTION => [],
-                NODE_TYPE.RESERVOIR => [],
-                NODE_TYPE.TANK => [])
+    nodes = Dict(NODE_TYPE.JUNCTION => Vector{Int}(),
+                NODE_TYPE.RESERVOIR => Vector{Int}(),
+                NODE_TYPE.TANK => Vector{Int}())
     index = 0
-    while lengthOfArraysOfDict(nodes) < ENgetcount(COUNT.NODE)
-        if typeof(ENgetnodetype(index)) <: Real
-            append!(nodes[ENgetnodetype(index)], index)
+    while _lengthOfArraysOfDict(nodes) < ENgetcount(COUNT.NODE)
+        try
+            push!(nodes[ENgetnodetype(index)], index)
+        catch EpanetException
         end
         index += 1
     end
@@ -540,26 +542,27 @@ function getDictOfNodeIndexes()
 end
 
 function getDictOfLinkIndexes()
-    links = Dict(LINK_TYPE.CVPIPE => [],
-                LINK_TYPE.PIPE => [],
-                LINK_TYPE.PUMP => [],
-                LINK_TYPE.PRV => [],
-                LINK_TYPE.PSV => [],
-                LINK_TYPE.PBV => [],
-                LINK_TYPE.FCV => [],
-                LINK_TYPE.TCV => [],
-                LINK_TYPE.GPV => [])
+    links = Dict(LINK_TYPE.CVPIPE => Vector{Int}(),
+                LINK_TYPE.PIPE => Vector{Int}(),
+                LINK_TYPE.PUMP => Vector{Int}(),
+                LINK_TYPE.PRV => Vector{Int}(),
+                LINK_TYPE.PSV => Vector{Int}(),
+                LINK_TYPE.PBV => Vector{Int}(),
+                LINK_TYPE.FCV => Vector{Int}(),
+                LINK_TYPE.TCV => Vector{Int}(),
+                LINK_TYPE.GPV => Vector{Int}())
     index = 0
-    while lengthOfArraysOfDict(links) < ENgetcount(COUNT.LINK)
-        if typeof(ENgetlinktype(index)) <: Real
-            append!(links[ENgetlinktype(index)], index)
+    while _lengthOfArraysOfDict(links) < ENgetcount(COUNT.LINK)
+        try
+            push!(links[ENgetlinktype(index)], index)
+        catch EpanetException
         end
         index += 1
     end
     return links
 end
 
-lengthOfArraysOfDict(dict::Dict) = sum([length(dict[key]) for key in keys(dict)])
+_lengthOfArraysOfDict(dict::Dict) = sum([length(dict[key]) for key in keys(dict)])
 
 """ These are codes used by the DLL functions """
 
@@ -655,167 +658,74 @@ struct __link_type
 end
 LINK_TYPE = __link_type(0, 1, 2, 3, 4, 5, 6, 7, 8)
 
-EN_NONE       = 0;   # Quality analysis types 
-EN_CHEM       = 1;
-EN_AGE        = 2;
-EN_TRACE      = 3;
+struct __qual_analysis_types
+    NONE::Int
+    CHEM::Int
+    AGE::Int
+    TRACE::Int
+end
+QUAL_ANALYS_TYPE = __qual_analysis_types(0, 1, 2, 3)
 
-EN_CONCEN     = 0;   # Source quality types 
-EN_MASS       = 1;
-EN_SETPOINT   = 2;
-EN_FLOWPACED  = 3;
+struct __source_qual_types
+    CONCEN::Int
+    MASS::Int
+    SETPOINT::Int
+    FLOWPACED::Int
+end
+SOURCE_QUAL_TYPE = __source_qual_types(0, 1, 2, 3)
 
-EN_CFS        = 0;   # Flow units types 
-EN_GPM        = 1;
-EN_MGD        = 2;
-EN_IMGD       = 3;
-EN_AFD        = 4;
-EN_LPS        = 5;
-EN_LPM        = 6;
-EN_MLD        = 7;
-EN_CMH        = 8;
-EN_CMD        = 9;
+struct __flow_unit_types
+    CFS::Int
+    GPM::Int
+    MGD::Int
+    IMGD::Int
+    AFD::Int
+    LPS::Int
+    LPM::Int
+    MLD::Int
+    CMH::Int
+    CMD::Int
+end
+FLOW_UNIT_TYPE = __flow_unit_types(0, 1, 2, 3, 4, 5, 6, 7, 8, 9)
 
-EN_TRIALS     = 0;   # Option types 
-EN_ACCURACY   = 1;
-EN_TOLERANCE  = 2;
-EN_EMITEXPON  = 3;
-EN_DEMANDMULT = 4;
+struct __options_types
+    TRIALS::Int
+    ACCURACY::Int
+    TOLERANCE::Int
+    EMITEXPON::Int
+    DEMANDMULT::Int
+end
+OPTIONS_TYPE = __options_types(0, 1, 2, 3, 4)
 
-EN_LOWLEVEL   = 0;   # Control types 
-EN_HILEVEL    = 1;
-EN_TIMER      = 2;
-EN_TIMEOFDAY  = 3;
+struct __control_types
+    LOWLEVEL::Int
+    HILEVEL::Int;
+    TIMER::Int
+    TIMEOFDAY::Int
+end
+CONTROL_TYPE = __control_types(0, 1, 2, 3)
 
-EN_AVERAGE    = 1;   # Time statistic types 
-EN_MINIMUM    = 2; 
-EN_MAXIMUM    = 3;
-EN_RANGE      = 4;
+struct __time_statistic_types
+    AVERAGE::Int
+    MINIMUM::Int
+    MAXIMUM::Int
+    RANGE::Int
+end
+TIME_STATISTICS_TYPE = __time_statistic_types(1, 2, 3, 4)
 
-EN_MIX1       = 0;   # Tank mixing models 
-EN_MIX2       = 1;
-EN_FIFO       = 2;
-EN_LIFO       = 3;
+struct __tank_mixing_models
+    MIX1::Int
+    MIX2::Int
+    FIFO::Int
+    LIFO::Int
+end
+TANK_MIXING_MODEL = __tank_mixing_models(0, 1, 2, 3)
 
-EN_NOSAVE     = 0;   # Save-results-to-file flag 
-EN_SAVE       = 1;
-EN_INITFLOW   = 10;  # Re-initialize flow flag 
+struct __report_status
+    NOSAVE::Int   # Save-results-to-file flag 
+    SAVE::Int
+    INITFLOW::Int  # Re-initialize flow flag 
+end
+REPORT_STATUS = __report_status(0, 1, 10)
 
 end #end module
-
-
-
-
-
-# epa = ENopen("C:\\Users\\ferna\\Desktop\\Net3.inp", "")
-
-# epa = ENopenH()
-# epa = ENinitH()
-
-# epa = ENsolveH()
-
-
-# # current_time =  Ref{Int32}(5)
-# epa = ENrunH()
-# # current_time[]
-
-
-# # time_step =  Ref{Int32}(0)
-# # epa = ENnextH()
-# # time_step[]
-
-
-# error = ENcloseH()
-
-# # epa = ENsaveinpfile("test1.inp")
-
-
-# # err = ENsolveQ()
-
-
-# epa = ENopenQ()
-# epa = ENinitQ()
-# # current_time =  Ref{Int32}(5)
-# epa = ENrunQ()
-# # current_time[]
-
-# err = ENstepQ()
-
-# error = ENcloseQ()
-# # ENwriteline("test.rpt")
-
-# # error = ENreport()
-
-# # ENresetreport()
-
-# # err = ENgetcontrol(1)
-
-# # err = ENgetcount(EN_NODECOUNT)
-
-# # err = ENgetoption(EN_TOLERANCE)
-
-# err = ENgettimeparam(EN_DURATION)
-
-# # err = ENgetflowunits()
-
-# err = ENgetpatternindex("1")
-
-# err = ENgetpatternid(1)
-
-# err = ENgetpatternlen(1)
-
-
-# err = ENgetpatternvalue()
-
-# err = ENgetqualtype()
-
-# err = ENgeterror(102, 127)
-
-# err = ENgetnodeindex("129")
-
-
-# err = ENgetnodeid(25)
-
-# err = ENgetnodetype(97)
-
-# err = ENgetlinkindex("129")
-
-# err = ENgetlinkid(23)
-
-# err = ENgetlinktype(97)
-
-# err = ENgetlinknodes(27)
-
-# err = ENgetlinkvalue(27, 5)
-
-# err = ENgetversion()
-
-# err = ENsetcontrol(5, 1, 1, 1, 1, 1)
-
-# err = ENsetnodevalue(5, 1, 17.4156)
-# err = ENgetnodevalue(5, 1)
-
-
-# err = ENsetlinkvalue(15, 2, 7.46)
-# err = ENgetlinkvalue(15, 2)
-
-# err = ENgetpatternindex("testpattern")
-# err = ENaddpattern("testpattern")
-# err = ENgetpatternindex("testpattern")
-
-# err = ENsetpatternvalue(1, 2, 3.5)
-# err = ENgetpatternvalue(1, 2)
-
-# err = ENsettimeparam(2, 5)
-# err = ENgettimeparam(3)
-
-# err = ENsetoption(1, .05)
-# err = ENgetoption(1)
-
-# err = ENsetstatusreport(1)
-# err = ENsetstatusreport(4)
-
-# err = ENgetqualtype()
-# err = ENsetqualtype(2)
-# err = ENgetqualtype()
-

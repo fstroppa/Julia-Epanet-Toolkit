@@ -3,6 +3,7 @@ em = Epanet
 using Test
 using Suppressor
 
+#  From https://www.epa.gov/water-research/epanet
 network_path = "unit_tests\\Net3.inp"
 
 function initialize_epanet()
@@ -55,12 +56,12 @@ end
 
     @testset "next" begin
         initialize_epanet()
-        @test em.ENstepQ() == 604800
-        @test em.ENnextH() == 900
-        @test em.ENnextQ() == 900
-        @test em.ENrunH() == 900
-        @test em.ENrunQ() == 900
-        @test em.ENstepQ() == 603900
+        @test em.ENstepQ() == 86400
+        @test em.ENnextH() == 3600
+        @test em.ENnextQ() == 3600
+        @test em.ENrunH() == 3600
+        @test em.ENrunQ() == 3600
+        @test em.ENstepQ() == 82800
         close_epanet()
     end
 
@@ -82,7 +83,7 @@ end
         @test em.ENgetcount(em.COUNT.LINK) == 119
         @test em.ENgetcount(em.COUNT.PAT) == 5
         @test em.ENgetcount(em.COUNT.CURVE) == 2
-        @test em.ENgetcount(em.COUNT.CONTROL) == 18
+        @test em.ENgetcount(em.COUNT.CONTROL) == 6
         @test_throws em.EpanetException em.ENgetcount(-999)
         close_epanet()
     end
@@ -139,14 +140,14 @@ end
 
     @testset "Time parameters" begin
         initialize_epanet()
-        @test em.ENgettimeparam(em.TIME_PARAMETER.DURATION) == 604800
-        @test em.ENgettimeparam(em.TIME_PARAMETER.HYDSTEP) == 900
-        @test em.ENgettimeparam(em.TIME_PARAMETER.QUALSTEP) == 900
+        @test em.ENgettimeparam(em.TIME_PARAMETER.DURATION) == 86400
+        @test em.ENgettimeparam(em.TIME_PARAMETER.HYDSTEP) == 3600
+        @test em.ENgettimeparam(em.TIME_PARAMETER.QUALSTEP) == 300
         @test em.ENgettimeparam(em.TIME_PARAMETER.PATTERNSTEP) == 3600
         @test em.ENgettimeparam(em.TIME_PARAMETER.PATTERNSTART) == 0
-        @test em.ENgettimeparam(em.TIME_PARAMETER.REPORTSTEP) == 900
+        @test em.ENgettimeparam(em.TIME_PARAMETER.REPORTSTEP) == 3600
         @test em.ENgettimeparam(em.TIME_PARAMETER.REPORTSTART) == 0
-        @test em.ENgettimeparam(em.TIME_PARAMETER.RULESTEP) == 90
+        @test em.ENgettimeparam(em.TIME_PARAMETER.RULESTEP) == 360
         @test em.ENgettimeparam(em.TIME_PARAMETER.STATISTIC) == 0
         @test em.ENgettimeparam(em.TIME_PARAMETER.PERIODS) == 0
         close_epanet()
